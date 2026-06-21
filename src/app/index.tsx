@@ -7,6 +7,8 @@ import {
   StyleSheet,
   FlatList,
   Alert,
+  useColorScheme,
+  SafeAreaView,
 } from 'react-native';
 import {
   saveHabits,
@@ -17,6 +19,7 @@ import {
   isCompletedToday,
 } from '../storage/habitStorage';
 import ProgressBar from '../components/progressBar';
+import { Colors, Spacing } from '../constants/theme';
 
 type Habit = {
   name: string;
@@ -25,6 +28,9 @@ type Habit = {
 };
 
 export default function HomeScreen() {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+
   const [habitName, setHabitName] = useState('');
   const [habits, setHabits] = useState<Habit[]>([]);
   const [showInput, setShowInput] = useState(false);
@@ -77,54 +83,79 @@ export default function HomeScreen() {
     loadHabits();
   };
 
+  const completedCount = habits.filter((h) => h.completedToday).length;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Habits 💪</Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>My Habits 💪</Text>
+        <Text style={[styles.date, { color: colors.textSecondary }]}>
+          {new Date().toDateString()}
+        </Text>
+      </View>
 
-      <ProgressBar
-        completed={habits.filter((h) => h.completedToday).length}
-        total={habits.length}
-      />
+      {/* Progress Bar */}
+      <ProgressBar completed={completedCount} total={habits.length} />
 
-      {habits.length === 0 && (
-        <Text style={styles.subtitle}>No habits yet. Add one!</Text>
+      {/* Habit List */}
+      {habits.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyEmoji}>🌱</Text>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+            No habits yet. Add one to get started!
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={habits}
+          keyExtractor={(item) => item.name}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <View style={[styles.habitCard, { backgroundColor: colors.backgroundElement }]}>
+              <View style={styles.habitInfo}>
+                <Text style={[styles.habitText, { color: colors.text }]}>
+                  {item.name}
+                </Text>
+                <Text style={[styles.streakText, { color: colors.textSecondary }]}>
+                  🔥 {item.streak} day streak
+                </Text>
+              </View>
+              <View style={styles.habitActions}>
+                <TouchableOpacity
+                  style={[
+                    styles.doneButton,
+                    { backgroundColor: item.completedToday ? '#4CAF50' : '#6C63FF' },
+                  ]}
+                  onPress={() => handleComplete(item.name)}
+                  disabled={item.completedToday}
+                >
+                  <Text style={styles.doneButtonText}>
+                    {item.completedToday ? '✅' : '○'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleDelete(item.name)}
+                >
+                  <Text style={styles.deleteText}>🗑️</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        />
       )}
 
-      <FlatList
-        data={habits}
-        keyExtractor={(item) => item.name}
-        renderItem={({ item }) => (
-          <View style={styles.habitCard}>
-            <View>
-              <Text style={styles.habitText}>{item.name}</Text>
-              <Text style={styles.streakText}>🔥 {item.streak} day streak</Text>
-            </View>
-            <TouchableOpacity
-              style={[
-                styles.doneButton,
-                item.completedToday && styles.doneButtonCompleted,
-              ]}
-              onPress={() => handleComplete(item.name)}
-              disabled={item.completedToday}
-            >
-              <Text style={styles.doneButtonText}>
-                {item.completedToday ? '✅ Done' : 'Mark Done'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDelete(item.name)}>
-              <Text style={styles.deleteText}>🗑️</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-
+      {/* Add Habit Input */}
       {showInput && (
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { backgroundColor: colors.backgroundElement }]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: colors.text, borderColor: '#6C63FF' }]}
             placeholder="e.g. Drink water, Exercise..."
+            placeholderTextColor={colors.textSecondary}
             value={habitName}
             onChangeText={setHabitName}
+            autoFocus
           />
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
             <Text style={styles.buttonText}>Save 💾</Text>
@@ -132,93 +163,113 @@ export default function HomeScreen() {
         </View>
       )}
 
+      {/* Add Button */}
       <TouchableOpacity
-        style={styles.addButton}
+        style={[styles.addButton, { backgroundColor: showInput ? '#FF6B6B' : '#6C63FF' }]}
         onPress={() => setShowInput(!showInput)}
       >
         <Text style={styles.buttonText}>
           {showInput ? '✕ Cancel' : '+ Add Habit'}
         </Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    padding: 24,
-    backgroundColor: '#fff',
-    paddingTop: 60,
+    padding: Spacing.four,
+  },
+  header: {
+    marginBottom: Spacing.three,
+    marginTop: Spacing.two,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 10,
+  },
+  date: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyEmoji: {
+    fontSize: 60,
+    marginBottom: Spacing.three,
+  },
+  emptyText: {
+    fontSize: 16,
     textAlign: 'center',
   },
-  subtitle: {
-    fontSize: 16,
-    color: 'gray',
-    textAlign: 'center',
-    marginBottom: 20,
+  list: {
+    paddingBottom: Spacing.four,
   },
   habitCard: {
-    backgroundColor: '#f0eeff',
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 10,
+    padding: Spacing.three,
+    borderRadius: 14,
+    marginBottom: Spacing.two,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  habitInfo: {
+    flex: 1,
+  },
   habitText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '600',
   },
   streakText: {
     fontSize: 13,
-    color: '#888',
     marginTop: 4,
   },
-  doneButton: {
-    backgroundColor: '#6C63FF',
-    padding: 8,
-    borderRadius: 8,
+  habitActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  doneButtonCompleted: {
-    backgroundColor: '#4CAF50',
+  doneButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   doneButtonText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  deleteButton: {
+    padding: 4,
   },
   deleteText: {
-    fontSize: 20,
+    fontSize: 18,
   },
   inputContainer: {
-    marginTop: 20,
+    padding: Spacing.three,
+    borderRadius: 14,
+    marginBottom: Spacing.two,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderWidth: 1.5,
     borderRadius: 10,
-    padding: 14,
+    padding: 12,
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: Spacing.two,
   },
   addButton: {
-    backgroundColor: '#6C63FF',
-    padding: 16,
-    borderRadius: 10,
+    padding: Spacing.three,
+    borderRadius: 14,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: Spacing.two,
   },
   saveButton: {
     backgroundColor: '#4CAF50',
-    padding: 16,
+    padding: 12,
     borderRadius: 10,
     alignItems: 'center',
   },

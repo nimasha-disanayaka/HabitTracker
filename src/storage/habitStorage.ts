@@ -82,3 +82,46 @@ export const isCompletedToday = async (habitName: string): Promise<boolean> => {
     return false;
   }
 };
+export const getTotalCompletions = async (): Promise<number> => {
+  try {
+    const raw = await AsyncStorage.getItem(COMPLETED_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    let total = 0;
+    for (const habit in data) {
+      total += data[habit].length;
+    }
+    return total;
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const getBestStreak = async (): Promise<number> => {
+  try {
+    const habits = await getHabits();
+    let best = 0;
+    for (const habit of habits) {
+      const streak = await getStreak(habit);
+      if (streak > best) best = streak;
+    }
+    return best;
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const getCompletionRate = async (): Promise<number> => {
+  try {
+    const habits = await getHabits();
+    if (habits.length === 0) return 0;
+    const raw = await AsyncStorage.getItem(COMPLETED_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    let completed = 0;
+    for (const habit of habits) {
+      if (data[habit] && data[habit].length > 0) completed++;
+    }
+    return Math.round((completed / habits.length) * 100);
+  } catch (error) {
+    return 0;
+  }
+};
