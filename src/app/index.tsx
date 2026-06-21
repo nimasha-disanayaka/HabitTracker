@@ -8,21 +8,41 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
-import { saveHabits, getHabits, deleteHabit } from '../storage/habitStorage';
+import {
+  saveHabits,
+  getHabits,
+  deleteHabit,
+  markHabitDone,
+  getStreak,
+  isCompletedToday,
+} from '../storage/habitStorage';
+import ProgressBar from '../components/progressBar';
+
+type Habit = {
+  name: string;
+  streak: number;
+  completedToday: boolean;
+};
 
 export default function HomeScreen() {
   const [habitName, setHabitName] = useState('');
-  const [habits, setHabits] = useState<string[]>([]);
+  const [habits, setHabits] = useState<Habit[]>([]);
   const [showInput, setShowInput] = useState(false);
 
-  // Load habits when app starts
   useEffect(() => {
     loadHabits();
   }, []);
 
   const loadHabits = async () => {
     const saved = await getHabits();
-    setHabits(saved);
+    const habitsWithStreak = await Promise.all(
+      saved.map(async (name) => ({
+        name,
+        streak: await getStreak(name),
+        completedToday: await isCompletedToday(name),
+      }))
+    );
+    setHabits(habitsWithStreak);
   };
 
   const handleSave = async () => {
@@ -30,11 +50,12 @@ export default function HomeScreen() {
       Alert.alert('Oops!', 'Please enter a habit name');
       return;
     }
-    const updated = [...habits, habitName];
-    setHabits(updated);
+    const names = habits.map((h) => h.name);
+    const updated = [...names, habitName];
     await saveHabits(updated);
     setHabitName('');
     setShowInput(false);
+    loadHabits();
   };
 
   const handleDelete = async (name: string) => {
@@ -45,16 +66,25 @@ export default function HomeScreen() {
         style: 'destructive',
         onPress: async () => {
           await deleteHabit(name);
-          const updated = habits.filter((h) => h !== name);
-          setHabits(updated);
+          loadHabits();
         },
       },
     ]);
   };
 
+  const handleComplete = async (name: string) => {
+    await markHabitDone(name);
+    loadHabits();
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Habits 💪</Text>
+
+      <ProgressBar
+        completed={habits.filter((h) => h.completedToday).length}
+        total={habits.length}
+      />
 
       {habits.length === 0 && (
         <Text style={styles.subtitle}>No habits yet. Add one!</Text>
@@ -62,11 +92,26 @@ export default function HomeScreen() {
 
       <FlatList
         data={habits}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <View style={styles.habitCard}>
-            <Text style={styles.habitText}>✅ {item}</Text>
-            <TouchableOpacity onPress={() => handleDelete(item)}>
+            <View>
+              <Text style={styles.habitText}>{item.name}</Text>
+              <Text style={styles.streakText}>🔥 {item.streak} day streak</Text>
+            </View>
+            <TouchableOpacity
+              style={[
+                styles.doneButton,
+                item.completedToday && styles.doneButtonCompleted,
+              ]}
+              onPress={() => handleComplete(item.name)}
+              disabled={item.completedToday}
+            >
+              <Text style={styles.doneButtonText}>
+                {item.completedToday ? '✅ Done' : 'Mark Done'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDelete(item.name)}>
               <Text style={styles.deleteText}>🗑️</Text>
             </TouchableOpacity>
           </View>
@@ -129,7 +174,26 @@ const styles = StyleSheet.create({
   },
   habitText: {
     fontSize: 16,
+    fontWeight: 'bold',
     color: '#333',
+  },
+  streakText: {
+    fontSize: 13,
+    color: '#888',
+    marginTop: 4,
+  },
+  doneButton: {
+    backgroundColor: '#6C63FF',
+    padding: 8,
+    borderRadius: 8,
+  },
+  doneButtonCompleted: {
+    backgroundColor: '#4CAF50',
+  },
+  doneButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
   deleteText: {
     fontSize: 20,
