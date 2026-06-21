@@ -20,6 +20,10 @@ import {
 } from '../storage/habitStorage';
 import ProgressBar from '../components/progressBar';
 import { Colors, Spacing } from '../constants/theme';
+import {
+  requestPermissions,
+  scheduleDailyReminder,
+} from '../utils/notifications';
 
 type Habit = {
   name: string;
@@ -37,6 +41,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     loadHabits();
+    requestPermissions();
   }, []);
 
   const loadHabits = async () => {
@@ -59,9 +64,11 @@ export default function HomeScreen() {
     const names = habits.map((h) => h.name);
     const updated = [...names, habitName];
     await saveHabits(updated);
+    await scheduleDailyReminder(habitName, 9, 0);
     setHabitName('');
     setShowInput(false);
     loadHabits();
+    Alert.alert('✅ Habit Added!', `Daily reminder set for ${habitName} at 9:00 AM!`);
   };
 
   const handleDelete = async (name: string) => {

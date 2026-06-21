@@ -125,3 +125,12 @@ export const getCompletionRate = async (): Promise<number> => {
     return 0;
   }
 };
+export const getCompletedDates = async (habitName: string): Promise<string[]> => {
+  try {
+    const raw = await AsyncStorage.getItem(COMPLETED_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    return data[habitName] || [];
+  } catch (error) {
+    return [];
+  }
+};
