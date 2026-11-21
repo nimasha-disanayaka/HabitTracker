@@ -32,14 +32,25 @@ HabitFlow is an offline-first mobile habit tracking application built using Reac
 
 ## Screenshots
 
-Application screenshots will be added here.
+Explore HabitFlow's mobile interface, designed to make daily habit tracking simple and intuitive:
 
-Suggested screenshots:
-- Today Dashboard
-- Add Habit Screen
-- Calendar View
-- Statistics Screen
-- Notification Settings
+<p align="center">
+  <img src="screenshots/today.jpg" width="190" alt="Today Dashboard" />
+  &nbsp;&nbsp;
+  <img src="screenshots/add-habit.jpg" width="190" alt="Add Habit Screen" />
+  &nbsp;&nbsp;
+  <img src="screenshots/calendar.jpg" width="190" alt="Calendar View" />
+</p>
+
+<p align="center">
+  <img src="screenshots/statistics.jpg" width="190" alt="Statistics Screen" />
+  &nbsp;&nbsp;
+  <img src="screenshots/settings.jpg" width="190" alt="Settings Screen" />
+</p>
+
+<p align="center">
+  <sub><b>Today Dashboard &bull; Add / Edit Habit &bull; Monthly Calendar &bull; Statistics & Analytics &bull; Notification Settings</b></sub>
+</p>
 
 ## Getting Started
 
