@@ -1,20 +1,53 @@
+// App.js - Entry point for HabitFlow
+import React, { useEffect } from 'react';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
 
-export default function App() {
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import RootNavigator from './src/navigation/RootNavigator';
+import { initNotifications } from './src/services/notificationService';
+import { reconcileAllHabitReminders } from './src/storage/habitStorage';
+
+function NavigationWrapper() {
+  const { theme, isDark } = useTheme();
+
+  useEffect(() => {
+    // 1. Configure Android notification channel & foreground handler
+    initNotifications();
+    // 2. Reconcile habit reminders with system scheduler to restore after app restart
+    reconcileAllHabitReminders();
+  }, []);
+
+  const navigationTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      primary: theme.primary,
+      background: theme.background,
+      card: theme.surface,
+      text: theme.textPrimary,
+      border: theme.border,
+    },
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer theme={navigationTheme}>
+      <StatusBar
+        style={isDark ? 'light' : 'dark'}
+        backgroundColor={theme.background}
+      />
+      <RootNavigator />
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <NavigationWrapper />
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+}
