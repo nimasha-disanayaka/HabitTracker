@@ -1,56 +1,147 @@
-# Welcome to your Expo app 👋
+# HabitFlow – Offline Habit Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Build better habits, stay consistent, and track your progress.**
 
-## Get started
+HabitFlow is an offline-first mobile habit tracking application built using React Native and Expo SDK 58. It helps users organize daily routines, maintain streaks, monitor progress, and receive scheduled reminders without requiring an internet connection for everyday habit tracking.
 
-1. Install dependencies
+## Key Features
 
-   ```bash
-   npm install
-   ```
+- **Habit Management:** Create, edit, and delete personal habits.
+- **Daily Dashboard:** View habits and track daily completion.
+- **Streak Tracking:** Monitor consistency and habit streaks.
+- **Calendar View:** Review habit completion history.
+- **Progress Statistics:** Visualize habit performance and completion progress.
+- **Daily Reminders:** Schedule local notifications for individual habits.
+- **Reminder Settings:** Update or disable scheduled reminders.
+- **Offline Storage:** Store habit data locally using AsyncStorage.
+- **Mobile-Friendly Interface:** Navigate between screens using bottom tabs and stack navigation.
 
-2. Start the app
+## Technology Stack
 
-   ```bash
-   npx expo start
-   ```
+| Technology | Purpose |
+|---|---|
+| React Native 0.88.1 | Mobile application framework |
+| Expo SDK 58 | Mobile development platform |
+| React 19.3.0 | UI development |
+| JavaScript | Application logic |
+| React Navigation | Screen navigation |
+| AsyncStorage | Offline data persistence |
+| Expo Notifications | Local habit reminders |
+| Expo Vector Icons | Interface icons |
+| EAS Build | Android application builds |
 
-In the output, you'll find options to open the app in a
+## Screenshots
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Application screenshots will be added here.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Suggested screenshots:
+- Today Dashboard
+- Add Habit Screen
+- Calendar View
+- Statistics Screen
+- Notification Settings
 
-## Get a fresh project
+## Getting Started
 
-When you're ready, run:
+### Prerequisites
+
+- Node.js and npm
+- Git
+- Android device or Android emulator
+- Expo development environment
+
+### Installation
+
+Clone the repository:
 
 ```bash
-npm run reset-project
+git clone https://github.com/nimasha-disanayaka/HabitTracker.git
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Navigate to the application directory:
 
-### Other setup steps
+```bash
+cd HabitTracker
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Install dependencies:
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Start the development server:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+To launch the Android development workflow:
 
-Join our community of developers creating universal apps.
+```bash
+npm run android
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Note:** Native notification functionality may require a compatible Android development or preview build. Expo Go does not support every native capability.
+
+## Android APK
+
+HabitFlow has been built and tested on a physical Android device using an EAS preview build.
+
+To create an Android preview build:
+
+```bash
+npx eas-cli@latest build --platform android --profile preview
+```
+
+The resulting APK can be installed on a compatible Android device.
+
+## Offline-First Functionality
+
+HabitFlow uses `@react-native-async-storage/async-storage` to save habit information locally.
+
+Users can manage their habits and review locally stored progress without relying on a backend server or continuous internet connectivity.
+
+## Local Notifications
+
+HabitFlow integrates `expo-notifications` to support scheduled habit reminders.
+
+Users can configure reminder times, modify notification schedules, and disable reminders when they are no longer needed.
+
+Notification permissions must be granted on the device for reminders to appear.
+
+## Project Structure
+
+```text
+HabitTracker/
+├── assets/
+├── components/
+├── screens/
+├── src/
+│   ├── components/
+│   ├── navigation/
+│   ├── screens/
+│   ├── services/
+│   ├── storage/
+│   ├── theme/
+│   └── utils/
+├── App.js
+├── app.json
+├── eas.json
+├── index.js
+└── package.json
+```
+
+## Development Status
+
+The application includes implemented habit management, offline storage, calendar tracking, statistics, and local notification functionality.
+
+An Android preview APK has been generated and tested on a physical device.
+
+## Author
+
+Developed by [nimasha-disanayaka](https://github.com/nimasha-disanayaka).
+
+## Repository
+
+[HabitFlow – GitHub Repository](https://github.com/nimasha-disanayaka/HabitTracker)
